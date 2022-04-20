@@ -22,7 +22,7 @@ class Tweet(var body: String = "", var createdAt: String = "", var user: User? =
             tweet.createdAt = jsonObject.getString("created_at")
             tweet.user = User.fromJson(jsonObject.getJSONObject("user"))
 
-            //TODO fix timestamp
+            //timestamp
             tweet.timestamp = TimeFormatter.getTimeDifference(tweet.createdAt)
             return tweet
         }
