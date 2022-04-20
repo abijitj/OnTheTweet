@@ -1,8 +1,12 @@
 package com.codepath.apps.restclienttemplate
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -20,7 +24,6 @@ class TimelineActivity : AppCompatActivity() {
     val tweets = ArrayList<Tweet>()
 
     lateinit var swipeContainer: SwipeRefreshLayout
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +51,44 @@ class TimelineActivity : AppCompatActivity() {
         rvTweets.adapter = adapter
 
         populateHomeTimeline()
+    }
+
+    //DONE
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    //Handles clicks on the menu item
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if(item.itemId == R.id.compose){
+            //Navigate to compose screen
+
+            val intent = Intent(this, ComposeActivity::class.java)
+            startActivityForResult(intent, REQUEST_CODE)
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    //This method is called when we come back from ComposeActivity
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        //Log.i(TAG, "onActivityResult is called. resultCode = $resultCode and resultCode")
+        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE){
+            //Getting data from our intent (our tweet)
+            val tweet = data?.getParcelableExtra("tweet") as Tweet
+
+            //Update timeline
+            //Modifying the data source of tweets
+            tweets.add(0, tweet)
+            Log.i(TAG, "Tweet added to recycler view")
+
+            //Update adapter
+            adapter.notifyItemInserted(0)
+
+            //new tweet should automatically scroll to the top
+            rvTweets.smoothScrollToPosition(0)
+        }
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
     fun populateHomeTimeline(){
@@ -87,5 +128,6 @@ class TimelineActivity : AppCompatActivity() {
 
     companion object {
         val TAG = "TimelineActivity"
+        val REQUEST_CODE = 10
     }
 }
